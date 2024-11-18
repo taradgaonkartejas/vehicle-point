@@ -1,0 +1,52 @@
+# Node modules
+node_modules/
+
+# Build output (if using TypeScript, Babel, or similar)
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+
+# Dependency directories
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE or Editor directories and files
+.vscode/
+.idea/
+
+# Optional: If you use testing frameworks like Jest, Mocha, etc.
+coverage/
+
+# Optional: If you're using Docker, you can ignore the Docker-related files
+docker-compose.override.yml
+.dockerignore
+
+# Optional: If you use Redis, or similar
+*.pid
+*.seed
+
+# Optional: If you're using TypeScript and want to ignore compiled JS
+*.tsbuildinfo
+
+# Optional: Ignore Jest's cache
+jest-cache/
+
+# Optional: Ignore coverage reports if using a tool like Istanbul
+*.lcov-report/
+
+# Ignore some package manager files (e.g., Yarn)
+.yarn-integrity
+
+# Ignore npm package-lock file if using Yarn or other lock files
+package-lock.json
