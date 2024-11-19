@@ -1,27 +1,53 @@
 // frontend/src/Map.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
-import * as esri from 'esri-leaflet';
+import GeoRasterLayer from 'georaster-layer-for-leaflet'; // Import GeoRasterLayer
+import parseGeoraster from 'georaster';
 
 const Map: React.FC = () => {
+  // Use a ref to store the map instance
+  const mapRef = useRef<L.Map | null>(null);
+
   useEffect(() => {
-    // Create the map object, specifying the center and zoom level
-    const map = L.map('map', {
-      center: [37.7749, -122.4194], // Coordinates of San Francisco, you can change this
-      zoom: 12,
-    });
+    // Check if the map is already initialized
+    if (!mapRef.current) {
+      // Initialize the map only if it's not already initialized
+      mapRef.current = L.map('map').setView([0, 0], 5);
 
-    // Add an Esri basemap layer (you can choose other basemaps as needed)
-    esri.basemapLayer('Streets').addTo(map);
+      // Add OpenStreetMap basemap
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(mapRef.current);
 
-    // Optionally add other map layers or features here
+      const url_to_geotiff_file = "https://storage.googleapis.com/pdd-stac/disasters/hurricane-harvey/0831/20170831_172754_101c_3b_Visual.tif";
 
-    // Cleanup on component unmount to prevent memory leaks
+      parseGeoraster(url_to_geotiff_file).then((georaster: any) => {
+        console.log("georaster:", georaster);
+
+        const layer = new GeoRasterLayer({
+          attribution: 'Planet',
+          georaster: georaster,
+          resolution: 128
+           // Adjust resolution for better performance or visual quality
+        });
+
+        layer.addTo(mapRef.current);
+
+        // Fit the map to the bounds of the raster layer
+        if(!mapRef.current) return;
+        mapRef.current.fitBounds(layer.getBounds());
+      });
+    }
+
+    // Cleanup map when component unmounts
     return () => {
-      map.remove();
+      if (mapRef.current) {
+        mapRef.current.remove(); // Remove the map instance from the DOM
+        mapRef.current = null; // Clear the ref
+      }
     };
-  }, []);
+  }, []); // Empty dependency array ensures this effect runs only once when the component mounts
 
   return (
     <div
@@ -32,4 +58,3 @@ const Map: React.FC = () => {
 };
 
 export default Map;
-
